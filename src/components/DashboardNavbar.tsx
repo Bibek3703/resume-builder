@@ -82,7 +82,7 @@ export function DashboardNavbar(
             <Link
                 href="/account"
                 className={`transition-colors ${
-                    pathname.startsWith("/settings")
+                    pathname.startsWith("/account")
                         ? "text-blue-600 font-semibold"
                         : "text-gray-700 hover:text-blue-600"
                 }`}
