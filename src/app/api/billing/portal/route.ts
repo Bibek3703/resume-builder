@@ -1,31 +1,49 @@
-import {  users } from '@/drizzle/schema';
+import { users } from '@/drizzle/schema';
 import { db } from '@/lib/db';
 import { createPortalLink } from '@/lib/stripe';
 import { auth } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
 
-export async function POST() {
-    const { userId } = await auth();
-    if (!userId) return new NextResponse("Unauthorized", { status: 401 });
+interface BillingPortalResponse {
+    url: string;
+}
 
+export async function POST(): Promise<NextResponse<BillingPortalResponse | { error: string }>> {
     try {
-        const fetchedUsers: { stripeCustomerId: string | null }[] = await db.select({ stripeCustomerId: users.stripeCustomerId }).from(users).where(eq(users.id, userId));
-        
-        if (!fetchedUsers || fetchedUsers.length === 0) {
-            return new NextResponse("No subscription found", { status: 400 });
+        const { userId } = await auth();
+
+        if (!userId) {
+            return NextResponse.json(
+                { error: 'Unauthorized access' },
+                { status: 401 }
+            );
         }
 
-        const user = fetchedUsers[0]
+        const user = await db
+            .select({
+                stripeCustomerId: users.stripeCustomerId
+            })
+            .from(users)
+            .where(eq(users.id, userId))
+            .then(rows => rows[0]);
 
         if (!user?.stripeCustomerId) {
-            return new NextResponse("No subscription found", { status: 400 });
+            return NextResponse.json(
+                { error: 'No active subscription found' },
+                { status: 400 }
+            );
         }
 
         const portalUrl = await createPortalLink(user.stripeCustomerId);
+
         return NextResponse.json({ url: portalUrl });
     } catch (error) {
-        console.error('[BILLING_PORTAL_ERROR]', error);
-        return new NextResponse("Internal Server Error", { status: 500 });
+        console.error('[BILLING_PORTAL_ERROR]', error instanceof Error ? error.message : 'Unknown error');
+
+        return NextResponse.json(
+            { error: 'Failed to create billing portal link' },
+            { status: 500 }
+        );
     }
 }

@@ -1,4 +1,4 @@
-import { json, pgTable, serial, text, timestamp } from 'drizzle-orm/pg-core';
+import { json, pgTable, serial, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
     id: text('id').primaryKey(),
@@ -6,13 +6,16 @@ export const users = pgTable('users', {
     stripeSubscriptionId: text('stripe_subscription_id').unique(),
     stripePriceId: text('stripe_price_id'),
     stripeCurrentPeriodEnd: timestamp('stripe_current_period_end'),
+    createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export const resumes = pgTable('resumes', {
-    id: serial('id').primaryKey(),
+    id: uuid('id').defaultRandom(),
     userId: text('user_id').references(() => users.id),
     content: json('content'),
     createdAt: timestamp('created_at').defaultNow(),
+    updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 export type SelectUser = typeof users.$inferSelect;
