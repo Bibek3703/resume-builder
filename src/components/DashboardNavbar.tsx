@@ -1,48 +1,148 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "@/components/ui/sheet";
+import { useEffect, useState } from "react";
+import { LoadingSpinner } from "./LoadingSpinner";
 
-export function DashboardNavbar() {
+export function DashboardNavbar(
+    { userData }: { userData?: { fullName?: string; email?: string } | null },
+) {
+    const { user } = useUser();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
+    const [isNavigating, setIsNavigating] = useState(false);
+
+    // Fallback to client-side data if server-side props not available
+    const displayName = userData?.fullName || user?.fullName;
+    const displayEmail = userData?.email ||
+        user?.primaryEmailAddress?.emailAddress;
+
+    useEffect(() => {
+        setIsNavigating(true);
+        // Using requestAnimationFrame to wait for the next frame
+        // This helps prevent flash of loading state for quick navigations
+        const timeout = requestAnimationFrame(() => {
+            setIsNavigating(false);
+        });
+
+        return () => cancelAnimationFrame(timeout);
+    }, [pathname, searchParams]);
+
+    const Logo = () => (
+        <Link href="/dashboard" className="flex items-center gap-2">
+            <span className="text-xl font-bold text-blue-600">
+                ResumeCraft
+            </span>
+        </Link>
+    );
+
+    const NavItems = () => (
+        <>
+            <Link
+                href="/resumes"
+                className={`transition-colors ${
+                    pathname.startsWith("/resumes")
+                        ? "text-blue-600 font-semibold"
+                        : "text-gray-700 hover:text-blue-600"
+                }`}
+            >
+                My Resumes
+            </Link>
+            <Link
+                href="/templates"
+                className={`transition-colors ${
+                    pathname.startsWith("/templates")
+                        ? "text-blue-600 font-semibold"
+                        : "text-gray-700 hover:text-blue-600"
+                }`}
+            >
+                Templates
+            </Link>
+            <Link
+                href="/settings"
+                className={`transition-colors ${
+                    pathname.startsWith("/settings")
+                        ? "text-blue-600 font-semibold"
+                        : "text-gray-700 hover:text-blue-600"
+                }`}
+            >
+                Settings
+            </Link>
+            <Link
+                href="/account"
+                className={`transition-colors ${
+                    pathname.startsWith("/settings")
+                        ? "text-blue-600 font-semibold"
+                        : "text-gray-700 hover:text-blue-600"
+                }`}
+            >
+                Account
+            </Link>
+        </>
+    );
+
     return (
         <nav className="bg-white shadow-sm">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16 items-center">
-                    {/* Logo */}
-                    <Link href="/dashboard" className="flex items-center gap-2">
-                        <span className="text-xl font-bold text-blue-600">
-                            ResumeCraft
-                        </span>
-                    </Link>
+                    {/* Logo - Hidden on mobile */}
+                    <div className="hidden sm:block">
+                        <Logo />
+                    </div>
 
-                    {/* Navigation Items */}
+                    {/* Desktop Navigation */}
                     <div className="hidden sm:flex gap-6 items-center">
-                        <Link
-                            href="/dashboard/resumes"
-                            className={`transition-colors ${
-                                pathname.startsWith("/dashboard/resumes")
-                                    ? "text-blue-600 font-semibold"
-                                    : "text-gray-700 hover:text-blue-600"
-                            }`}
-                        >
-                            My Resumes
-                        </Link>
-                        <Link
-                            href="/dashboard/templates"
-                            className={`transition-colors ${
-                                pathname.startsWith("/dashboard/templates")
-                                    ? "text-blue-600 font-semibold"
-                                    : "text-gray-700 hover:text-blue-600"
-                            }`}
-                        >
-                            Templates
-                        </Link>
+                        <NavItems />
+                    </div>
+
+                    {/* Mobile Navigation */}
+                    <div className="sm:hidden">
+                        <Sheet>
+                            <SheetTrigger asChild>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-9 w-9 p-0"
+                                >
+                                    <Menu className="h-6 w-6" />
+                                </Button>
+                            </SheetTrigger>
+                            <SheetContent side="right" className="w-64">
+                                <SheetHeader>
+                                    <SheetTitle>
+                                        <Logo />
+                                    </SheetTitle>
+                                </SheetHeader>
+                                <div className="flex flex-col gap-4 mt-6">
+                                    <NavItems />
+                                </div>
+                            </SheetContent>
+                        </Sheet>
                     </div>
 
                     {/* User Account Menu */}
                     <div className="flex items-center gap-4">
+                        <div className="hidden md:block text-right">
+                            {displayName && (
+                                <p className="font-medium">{displayName}</p>
+                            )}
+                            {displayEmail && (
+                                <p className="text-sm text-gray-600">
+                                    {displayEmail}
+                                </p>
+                            )}
+                        </div>
                         <UserButton
                             afterSignOutUrl="/sign-in"
                             appearance={{
@@ -59,3 +159,5 @@ export function DashboardNavbar() {
         </nav>
     );
 }
+
+export default DashboardNavbar;
