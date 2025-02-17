@@ -1,6 +1,6 @@
 import { users } from '@/drizzle/schema';
 import { db } from '@/lib/db';
-import { createSubscriptionSession, getActiveSubscription, stripe } from '@/lib/stripe';
+import { createSubscriptionSession, getActiveSubscription } from '@/lib/stripe';
 import { auth } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';

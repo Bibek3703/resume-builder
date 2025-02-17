@@ -1,5 +1,4 @@
 import { DashboardNavbar } from "@/components/DashboardNavbar";
-import { ErrorToast } from "@/components/ErrorToast";
 import { ProgressBar } from "@/components/ProgressBar";
 import BillingProvider from "@/contexts/billing-context";
 import { getNavbarUserData } from "@/lib/user";

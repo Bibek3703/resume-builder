@@ -38,9 +38,9 @@ function PricingList() {
                 </div>
                 <div className="flex-1 p-10 w-auto border-none md:border-l md:border-dashed md:border-black/20 flex flex-col justify-center">
                     <p>
-                        "This is the best product ever when it comes to
-                        shipping. Ten on ten recommended. I just can't wait to
-                        see what happens with this product."
+                        &ldquo;This is the best product ever when it comes to
+                        shipping. Ten on ten recommended. I just can&apos;t wait
+                        to see what happens with this product.&rdquo;
                     </p>
                     <p className="font-bold mt-4">Echo AI</p>
                     <span>Side projects builder</span>
@@ -102,7 +102,7 @@ export const Header = (
     );
 };
 
-export const Icon = ({ className, ...rest }: any) => {
+export const Icon = ({ className, ...rest }: { className: string }) => {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"

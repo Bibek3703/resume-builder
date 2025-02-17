@@ -1,16 +1,10 @@
 import { users } from '@/drizzle/schema';
 import { db } from '@/lib/db';
+import { stripe } from '@/lib/stripe';
+import { getPlanName } from '@/lib/stripe/price';
 import { auth } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
-
-// Define subscription plans as an enum for type safety
-export enum SubscriptionPlan {
-    Free = 'Free',
-    Pro = 'Pro Plan',
-    Premium = 'Premium Plan',
-    Custom = 'Custom Plan'
-}
 
 // Define response types
 interface SubscriptionInactive {
@@ -19,33 +13,12 @@ interface SubscriptionInactive {
 
 interface SubscriptionActive {
     status: 'active';
-    plan: SubscriptionPlan;
+    plan: string;
     renewalDate: string;
 }
 
 type SubscriptionResponse = SubscriptionInactive | SubscriptionActive;
 
-// Price ID mapping for better maintainability
-const PRICE_ID_TO_PLAN: Record<string, SubscriptionPlan> = {
-    'price_pro': SubscriptionPlan.Pro,
-    'price_premium': SubscriptionPlan.Premium,
-    // Add more price mappings as needed
-};
-
-function getPlanName(priceId: string | null | undefined): SubscriptionPlan {
-    if (!priceId) return SubscriptionPlan.Free;
-
-    // Look up plan in mapping first
-    for (const [key, plan] of Object.entries(PRICE_ID_TO_PLAN)) {
-        if (priceId.includes(key)) return plan;
-    }
-
-    // Fallback to basic checks
-    if (priceId.includes('pro')) return SubscriptionPlan.Pro;
-    if (priceId.includes('premium')) return SubscriptionPlan.Premium;
-
-    return SubscriptionPlan.Custom;
-}
 
 export async function GET(): Promise<NextResponse<SubscriptionResponse | { error: string }>> {
     try {
@@ -72,9 +45,15 @@ export async function GET(): Promise<NextResponse<SubscriptionResponse | { error
             return NextResponse.json({ status: 'inactive' });
         }
 
+        const subscription = await stripe.subscriptions.retrieve(user?.stripeSubscriptionId);
+
+        console.log({subscription})
+
+        const plan = await getPlanName(subscription?.items.data[0]?.price.product as string)
+
         return NextResponse.json({
             status: 'active',
-            plan: getPlanName(user.stripePriceId),
+            plan: plan,
             renewalDate: user.stripeCurrentPeriodEnd?.toISOString() ?? new Date().toISOString()
         });
     } catch (error) {

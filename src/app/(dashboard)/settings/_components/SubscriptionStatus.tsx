@@ -1,16 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { useBilling } from "@/contexts/billing-context";
-import { useUser } from "@clerk/nextjs";
 import { format } from "date-fns";
-import React, { useEffect, useState } from "react";
-
-interface SubscriptionData {
-    status: string;
-    plan: string;
-    renewalDate: string;
-}
 
 function SubscriptionStatus() {
     const { loading, data } = useBilling();

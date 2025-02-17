@@ -2,7 +2,7 @@
 
 import { UserButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,32 +12,17 @@ import {
     SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet";
-import { useEffect, useState } from "react";
-import { LoadingSpinner } from "./LoadingSpinner";
 
 export function DashboardNavbar(
     { userData }: { userData?: { fullName?: string; email?: string } | null },
 ) {
     const { user } = useUser();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
-    const [isNavigating, setIsNavigating] = useState(false);
 
     // Fallback to client-side data if server-side props not available
     const displayName = userData?.fullName || user?.fullName;
     const displayEmail = userData?.email ||
         user?.primaryEmailAddress?.emailAddress;
-
-    useEffect(() => {
-        setIsNavigating(true);
-        // Using requestAnimationFrame to wait for the next frame
-        // This helps prevent flash of loading state for quick navigations
-        const timeout = requestAnimationFrame(() => {
-            setIsNavigating(false);
-        });
-
-        return () => cancelAnimationFrame(timeout);
-    }, [pathname, searchParams]);
 
     const Logo = () => (
         <Link href="/dashboard" className="flex items-center gap-2">

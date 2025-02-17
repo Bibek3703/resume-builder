@@ -1,7 +1,6 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useUser } from "@clerk/nextjs";
 import { useState } from "react";
 import { CardSpotlight } from "./ui/card-spotlight";
 import { CheckIcon, X } from "lucide-react";

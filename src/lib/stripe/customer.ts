@@ -74,10 +74,10 @@ export async function getOrCreateCustomer({ userId, email }: CustomerCreationPar
  * Validates that the input email is properly formatted.
  * @throws {Error} If email is invalid
  */
-function validateEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-        throw new Error('Invalid email format');
-    }
-    return true;
-}
+// function validateEmail(email: string): boolean {
+//     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+//     if (!emailRegex.test(email)) {
+//         throw new Error('Invalid email format');
+//     }
+//     return true;
+// }

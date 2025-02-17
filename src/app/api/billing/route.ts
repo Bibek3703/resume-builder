@@ -1,6 +1,7 @@
 import { users } from '@/drizzle/schema';
 import { db } from '@/lib/db';
 import { stripe } from '@/lib/stripe';
+import { getPlanName } from '@/lib/stripe/price';
 import { auth } from '@clerk/nextjs/server';
 import { eq } from 'drizzle-orm';
 import { NextResponse } from 'next/server';
@@ -63,14 +64,3 @@ export async function GET() {
     }
 }
 
-async function getPlanName(productId?: string) {
-    if (!productId) return 'Free';
-    const product = await stripe.products.retrieve(productId, {
-        expand: ['price'],
-    });
-    // console.log({price})
-    // if (productId.includes('basic')) return 'Basic';
-    // if (productId.includes('pro')) return 'Pro';
-    // if (productId.includes('premium')) return 'Premium';
-    return product.name;
-}
