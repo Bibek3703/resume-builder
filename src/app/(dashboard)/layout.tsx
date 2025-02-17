@@ -1,6 +1,7 @@
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { ErrorToast } from "@/components/ErrorToast";
 import { ProgressBar } from "@/components/ProgressBar";
+import BillingProvider from "@/contexts/billing-context";
 import { getNavbarUserData } from "@/lib/user";
 
 export const metadata = {
@@ -15,11 +16,13 @@ export default async function DashboardLayout({
 }) {
     const userData = await getNavbarUserData();
     return (
-        <div className="min-h-screen bg-background">
-            <ProgressBar />
-            {/* <ErrorToast /> */}
-            <DashboardNavbar userData={userData} />
-            <main className="p-4 md:p-8">{children}</main>
-        </div>
+        <BillingProvider>
+            <div className="min-h-screen bg-background">
+                <ProgressBar />
+                {/* <ErrorToast /> */}
+                <DashboardNavbar userData={userData} />
+                <main className="p-4 md:p-8">{children}</main>
+            </div>
+        </BillingProvider>
     );
 }

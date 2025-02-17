@@ -68,11 +68,40 @@ export async function POST(req: NextRequest) {
                         clerkUserId: clerkUser.id
                     }
                 });
+
+                // Add to user.created handler
+                const subscription = await stripe.subscriptions.create({
+                    customer: customer.id,
+                    items: [{ price: process.env.STRIPE_BASIC_PRICE_ID }],
+                    payment_behavior: 'default_incomplete',
+                    expand: ['latest_invoice.payment_intent'],
+                    metadata: {
+                        clerkUserId: clerkUser.id
+                    }
+                });
+
               
                 // Insert user into database with Stripe customer ID
                 await db.insert(users)
-                    .values({ id, stripeCustomerId: customer.id, createdAt: new Date(), updatedAt: new Date() })
-                    .onConflictDoUpdate({ target: users.id, set: { stripeCustomerId: customer.id, createdAt: new Date(), updatedAt: new Date() } });
+                    .values({ 
+                        id, 
+                        email: clerkUser.email_addresses[0].email_address,
+                        stripeCustomerId: customer.id, 
+                        stripeSubscriptionId: subscription.id,
+                        stripePriceId: process.env.STRIPE_BASIC_PRICE_ID,
+                        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                        createdAt: new Date(), 
+                        updatedAt: new Date() 
+                    })
+                    .onConflictDoUpdate({ target: users.id, set: { 
+                        email: clerkUser.email_addresses[0].email_address,
+                        stripeCustomerId: customer.id,
+                        stripeSubscriptionId: subscription.id,
+                        stripePriceId: process.env.STRIPE_BASIC_PRICE_ID,
+                        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                        createdAt: new Date(),
+                        updatedAt: new Date() 
+                     } });
                 break;
             }
         }

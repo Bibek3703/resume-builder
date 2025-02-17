@@ -34,3 +34,33 @@ export async function updateSubscription(
         proration_behavior: 'create_prorations'
     });
 }
+
+export async function getActiveSubscription(customerId: string) {
+    const subscriptions = await stripe.subscriptions.list({
+        customer: customerId,
+        status: 'active',
+        limit: 1
+    });
+
+    return subscriptions.data[0];
+}
+
+export async function createSubscriptionSession(
+    customerId: string,
+    priceId: string,
+    currentSubscriptionId?: string
+) {
+    return stripe.checkout.sessions.create({
+        customer: customerId,
+        payment_method_types: ['card'],
+        line_items: [{ price: priceId, quantity: 1 }],
+        mode: 'subscription',
+        success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
+        cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
+        subscription_data: {
+            metadata: {
+                previous_subscription: currentSubscriptionId || ''
+            }
+        }
+    });
+}

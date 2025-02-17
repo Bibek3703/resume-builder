@@ -6,11 +6,12 @@ import { useState } from "react";
 import { CardSpotlight } from "./ui/card-spotlight";
 import { CheckIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useBilling } from "@/contexts/billing-context";
 
 const PLANS = [
     {
         productId: "prod_RmlbgN79GrwQfj",
-        name: "Basic",
+        name: "Free",
         currency: "EUR",
         prices: {
             month: {
@@ -119,10 +120,10 @@ const frequencyIds = {
 } as MapObject;
 
 export function SubscriptionCards(
-    { frequency = "month" }: { frequency: string },
+    { frequency = "month" }: { frequency?: string },
 ) {
-    const { user } = useUser();
     const [loading, setLoading] = useState<string | null>(null);
+    const { data } = useBilling();
 
     const handleSubscribe = async (priceId: string) => {
         setLoading(priceId);
@@ -139,7 +140,7 @@ export function SubscriptionCards(
     };
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 w-full mt-20 border-t">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-0 w-full border-t">
             {PLANS.map((plan, idx) => (
                 <CardSpotlight
                     key={plan.prices[frequency].priceId}
@@ -175,7 +176,8 @@ export function SubscriptionCards(
                         <Button
                             onClick={() =>
                                 handleSubscribe(plan.prices[frequency].priceId)}
-                            disabled={!!loading}
+                            disabled={!!loading ||
+                                plan.name === data?.subscription.plan}
                             className="w-full bg-green-500"
                         >
                             {loading === plan.prices[frequency].priceId

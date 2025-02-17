@@ -1,7 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { UserProfile } from "@clerk/nextjs";
 import { Metadata } from "next";
-import BillingButton from "../_components/BillingButton";
 import SubscriptionStatus from "../_components/SubscriptionStatus";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -24,7 +23,7 @@ export default function Settings() {
                     </h2>
                     <Button asChild>
                         <Link href="/settings/billing">
-                            Manage billing
+                            Manage Subscriptions
                         </Link>
                     </Button>
                 </Card>

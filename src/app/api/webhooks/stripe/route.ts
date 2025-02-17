@@ -1,13 +1,15 @@
-import { users } from '@/drizzle/schema';
+import { invoices, users } from '@/drizzle/schema';
 import { db } from '@/lib/db';
 import { stripe } from '@/lib/stripe';
 import { eq } from 'drizzle-orm';
-import { NextRequest, NextResponse } from 'next/server';
+import { headers } from 'next/headers';
+import {  NextResponse } from 'next/server';
 import Stripe from 'stripe';
 
-export async function POST(req: NextRequest) {
-    const body = await req.json()
-    const signature = await req.headers.get('stripe-signature') as string;
+export async function POST(req: Request) {
+    const body = await req.text()
+    const headerPayload = await headers()
+    const signature =  headerPayload.get('stripe-signature') as string;
 
     let event: Stripe.Event;
 
@@ -17,42 +19,101 @@ export async function POST(req: NextRequest) {
             signature,
             process.env.STRIPE_WEBHOOK_SECRET!
         );
-    } catch (error) {
-        return new NextResponse('Webhook Error', { status: 400 });
+    } catch (error: any) {
+        console.log({error: error?.message})
+        return new NextResponse('Webhook Error', { status: 500 });
     }
 
+
     switch (event.type) {
-        case 'customer.subscription.updated':
-            const subscription = event.data.object as Stripe.Subscription;
-            await db.update(users)
-                .set({
-                    stripeSubscriptionId: subscription.id,
-                    stripePriceId: subscription.items.data[0].price.id,
-                    stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
-                })
-                .where(eq(users.stripeCustomerId, subscription.customer as string));
+        case 'customer.subscription.created': {
+                console.log(`Customer subscription created`)
+                const subscription = event.data.object as Stripe.Subscription;
+                await db.update(users)
+                    .set({
+                        stripeSubscriptionId: subscription.id,
+                        stripePriceId: subscription.items.data[0].price.id,
+                        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                    })
+                    .where(eq(users.stripeCustomerId, subscription.customer as string));
+            }
             break;
 
-        case 'customer.subscription.deleted':
-            const deletedSubscription = event.data.object as Stripe.Subscription;
-            await db.update(users)
-                .set({
-                    stripeSubscriptionId: null,
-                    stripePriceId: null,
-                    stripeCurrentPeriodEnd: null,
-                })
-                .where(eq(users.stripeCustomerId, deletedSubscription.customer as string));
+        case 'customer.subscription.deleted':{
+                console.log(`Customer subscription deleted`)
+                const deletedSubscription = event.data.object as Stripe.Subscription;
+                await db.update(users)
+                    .set({
+                        stripeSubscriptionId: null,
+                        stripePriceId: null,
+                        stripeCurrentPeriodEnd: null,
+                    })
+                    .where(eq(users.stripeCustomerId, deletedSubscription.customer as string));
+            }
             break;
     
-        case 'checkout.session.completed':
-            const session = event.data.object as Stripe.Checkout.Session;
-            await db.update(users)
-                .set({
-                    stripeSubscriptionId: session.subscription as string,
-                    stripePriceId: session.metadata?.priceId,
-                })
-                .where(eq(users.stripeCustomerId, session.customer as string));
+        case 'checkout.session.completed':{
+                console.log(`Customer checkout completed`)
+                const session = event.data.object as Stripe.Checkout.Session;
+                const subscription = await stripe.subscriptions.retrieve(
+                    session.subscription as string
+                );
+
+                console.log({session})
+
+                // Cancel previous subscription
+                if (session?.metadata?.previous_subscription) {
+                    await stripe.subscriptions.update(
+                        session.metadata.previous_subscription,
+                        { cancel_at_period_end: true }
+                    );
+                }
+
+                // Update database
+                await db.update(users)
+                    .set({
+                        stripeSubscriptionId: subscription.id,
+                        stripePriceId: subscription.items.data[0].price.id,
+                        stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000)
+                    })
+                    .where(eq(users.stripeCustomerId, session.customer as string));
+            }
             break;
+        case 'invoice.payment_succeeded':{
+            const invoice = event.data.object as Stripe.Invoice;
+            // console.log({invoice})
+            const userId = invoice?.subscription_details?.metadata?.clerkUserId || "" as string
+            if(invoice){
+                await db.insert(invoices).values({
+                    id: invoice.id,
+                    userId,
+                    amount: invoice.amount_paid,
+                    currency: invoice.currency,
+                    status: 'paid',
+                    pdfUrl: invoice.invoice_pdf,
+                    date: new Date(invoice.created * 1000),
+                });
+            }
+        }
+        break;
+
+        case 'invoice.payment_failed':{
+            const failedInvoice = event.data.object as Stripe.Invoice;
+            // console.log({failedInvoice})
+            const userId = failedInvoice?.subscription_details?.metadata?.clerkUserId || "" as string
+            if (failedInvoice){
+                await db.insert(invoices).values({
+                    id: failedInvoice.id,
+                    userId,
+                    amount: failedInvoice.amount_paid,
+                    currency: failedInvoice.currency,
+                    status: 'failed',
+                    pdfUrl: failedInvoice.invoice_pdf,
+                    date: new Date(failedInvoice.created * 1000),
+                });
+            }
+        }
+        break;
     }
 
     return new NextResponse(null, { status: 200 });

@@ -1,143 +1,94 @@
 "use client";
 
-import { SubscriptionCards } from "@/components/SubscriptionCards";
-import { Button } from "@/components/ui/button";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { cn } from "@/lib/utils";
-import { useUser } from "@clerk/nextjs";
-import { MessageCircle } from "lucide-react";
-import { useEffect, useState } from "react";
+import PricingList from "../_components/PricingList";
+import SubscriptionStatus from "../_components/SubscriptionStatus";
+import { useBilling } from "@/contexts/billing-context";
 
 export default function BillingPage() {
-    const { user } = useUser();
-    const [subscription, setSubscription] = useState<any>(null);
-    const [loading, setLoading] = useState(true);
-    const [value, setValue] = useState("month");
+    const { data, loading } = useBilling();
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const res = await fetch("/api/subscription");
-                const data = await res.json();
-                setSubscription(data);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-
-    if (loading) return <Skeleton className="h-64 w-full" />;
+    if (loading) return <BillingSkeleton />;
 
     return (
-        <div className="flex flex-col border border-black/[0.2] group/canvas-card items-center dark:border-white/[0.2] w-full max-w-4xl mx-auto py-4 relative">
-            <Icon className="absolute h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
-            <Icon className="absolute h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
-            <Icon className="absolute h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
-            <Icon className="absolute h-6 w-6 -bottom-3 -right-3 dark:text-white text-black" />
+        <div className="max-w-4xl mx-auto py-8 space-y-8">
+            {/* Current Subscription Section */}
+            <section className="bg-white p-6 rounded-lg shadow">
+                <SubscriptionStatus />
+            </section>
 
-            <Header value={value} onValueChange={setValue} />
-            <SubscriptionCards frequency={value} />
-            <div className="relative mt-28 mb-12 flex flex-col md:flex-row items-center w-full bg-gray-50">
-                <div className="absolute top-0 md:-left-10 w-full md:w-[108%] border-t border-dashed border-black/20" />
-                <div className="absolute top-0 md:-top-5 md:left-5 h-full md:h-[118%] border-l border-dashed border-black/20" />
-                <div className="absolute bottom-0 md:-left-10 w-full md:w-[108%] border-t border-dashed border-black/20" />
-                <div className="absolute top-0 md:-top-5 md:right-5 h-full md:h-[118%] border-l border-dashed border-black/20" />
+            {/* Billing History Section */}
+            <section className="bg-white p-6 rounded-lg shadow">
+                <h2 className="text-2xl font-bold mb-6">Billing History</h2>
+                <div className="overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b">
+                                <th className="text-left py-3 px-4">Date</th>
+                                <th className="text-left py-3 px-4">Amount</th>
+                                <th className="text-left py-3 px-4">Status</th>
+                                <th className="text-left py-3 px-4">Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {data?.invoices.map((invoice) => (
+                                <tr key={invoice.id} className="border-b">
+                                    <td className="py-3 px-4">
+                                        {format(
+                                            new Date(invoice.date),
+                                            "MMM dd, yyyy",
+                                        )}
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        {(invoice.amount / 100).toLocaleString(
+                                            "en-US",
+                                            {
+                                                style: "currency",
+                                                currency: invoice.currency,
+                                            },
+                                        )}
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        <span
+                                            className={`px-2 py-1 rounded text-sm ${
+                                                invoice.status === "paid"
+                                                    ? "bg-green-100 text-green-800"
+                                                    : "bg-red-100 text-red-800"
+                                            }`}
+                                        >
+                                            {invoice.status}
+                                        </span>
+                                    </td>
+                                    <td className="py-3 px-4">
+                                        <a
+                                            href={invoice.pdfUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-blue-600 hover:underline"
+                                        >
+                                            View PDF
+                                        </a>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
 
-                <div className="p-10 pl-20 w-full md:max-w-lg flex flex-col gap-6 items-start">
-                    <h1>
-                        Buy for your team of 10 people and get pro upgrade
-                        absolutely free.
-                    </h1>
-                    <div className="flex gap-4">
-                        <Button>Buy now</Button>
-                        <Button variant="outline">
-                            Talk to us <MessageCircle />
-                        </Button>
-                    </div>
-                </div>
-                <div className="flex-1 p-10 w-auto border-l border-dashed border-black/20 flex flex-col justify-center">
-                    <p>
-                        "This is the best product ever when it comes to
-                        shipping. Ten on ten recommended. I just can't wait to
-                        see what happens with this product."
-                    </p>
-                    <p className="font-bold mt-4">Echo AI</p>
-                    <span>Side projects builder</span>
-                </div>
-            </div>
+            {/* Upgrade Section */}
+            <PricingList />
         </div>
     );
 }
 
-export const Header = (
-    { onValueChange = () => {}, value = "" }: {
-        value: string;
-        onValueChange: (value: string) => void;
-    },
-) => {
+function BillingSkeleton() {
     return (
-        <div className="w-full flex flex-col items-center gap-2 p-6 py-12 border-b border-black/[0.2]">
-            <h1 className="text-3xl font-bold">
-                Choose the plan that suits your needs
-            </h1>
-            <p className="text-md">
-                Pick a plan that suits your needs and get started instantly.
-            </p>
-            <RadioGroup
-                defaultValue="comfortable"
-                value={value}
-                onValueChange={onValueChange}
-                className="flex items-center gap-0 mt-4"
-            >
-                <RadioGroupItem
-                    value="month"
-                    id="month"
-                    className={cn(
-                        "w-20 h-8 border-none rounded-none rounded-s-full text-sm",
-                        value === "month"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-gray-500 text-primary-foreground",
-                    )}
-                >
-                    Month
-                </RadioGroupItem>
-
-                <RadioGroupItem
-                    value="year"
-                    id="year"
-                    className={cn(
-                        "w-20 h-8 border-none rounded-none rounded-e-full text-sm",
-                        value === "year"
-                            ? "bg-primary text-primary-foreground"
-                            : "bg-gray-500 text-primary-foreground",
-                    )}
-                >
-                    Year
-                </RadioGroupItem>
-            </RadioGroup>
+        <div className="max-w-4xl mx-auto py-8 space-y-8">
+            <Skeleton className="h-32 w-full" />
+            <Skeleton className="h-64 w-full" />
+            <Skeleton className="h-96 w-full" />
         </div>
     );
-};
-
-export const Icon = ({ className, ...rest }: any) => {
-    return (
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className={className}
-            {...rest}
-        >
-            <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 6v12m6-6H6"
-            />
-        </svg>
-    );
-};
+}
