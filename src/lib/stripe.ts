@@ -12,3 +12,25 @@ export const createPortalLink = async (customerId: string) => {
     });
     return session.url;
 };
+
+export async function updateSubscription(
+    customerId: string,
+    newPriceId: string
+) {
+    const subscription = await stripe.subscriptions.list({
+        customer: customerId,
+        limit: 1
+    });
+
+    if (subscription.data.length === 0) {
+        throw new Error('No active subscription');
+    }
+
+    return await stripe.subscriptions.update(subscription.data[0].id, {
+        items: [{
+            id: subscription.data[0].items.data[0].id,
+            price: newPriceId,
+        }],
+        proration_behavior: 'create_prorations'
+    });
+}

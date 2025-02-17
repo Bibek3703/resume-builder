@@ -43,6 +43,16 @@ export async function POST(req: NextRequest) {
                 })
                 .where(eq(users.stripeCustomerId, deletedSubscription.customer as string));
             break;
+    
+        case 'checkout.session.completed':
+            const session = event.data.object as Stripe.Checkout.Session;
+            await db.update(users)
+                .set({
+                    stripeSubscriptionId: session.subscription as string,
+                    stripePriceId: session.metadata?.priceId,
+                })
+                .where(eq(users.stripeCustomerId, session.customer as string));
+            break;
     }
 
     return new NextResponse(null, { status: 200 });
