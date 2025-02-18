@@ -13,6 +13,7 @@ export async function POST(req: Request) {
         const { priceId } = await req.json();
 
         const user = await db.select({
+            id: users.id,
             stripeCustomerId: users.stripeCustomerId
         })
         .from(users)
@@ -27,9 +28,10 @@ export async function POST(req: Request) {
         }
 
         const session = await createSubscriptionSession(
+            userId,
             user.stripeCustomerId!,
             priceId,
-            subscription?.id
+            subscription?.id,
         );
 
         return NextResponse.json({ url: session.url });

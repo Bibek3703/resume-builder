@@ -46,6 +46,7 @@ export async function getActiveSubscription(customerId: string) {
 }
 
 export async function createSubscriptionSession(
+    clerkUserId: string,
     customerId: string,
     priceId: string,
     currentSubscriptionId?: string
@@ -59,6 +60,7 @@ export async function createSubscriptionSession(
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
         subscription_data: {
             metadata: {
+                clerkUserId,
                 previous_subscription: currentSubscriptionId || '',
                 priceId,
             }

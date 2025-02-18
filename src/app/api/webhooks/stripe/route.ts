@@ -66,6 +66,7 @@ export async function POST(req: Request) {
                         session.metadata.previous_subscription,
                         { 
                             items: [{
+                                id: subscription?.items?.data[0].id as string,
                                 price: session?.metadata?.priceId,
                             }],
                             proration_behavior: 'create_prorations',
@@ -91,7 +92,7 @@ export async function POST(req: Request) {
             console.log({ userId })
 
 
-            if(invoice){
+            if(invoice && userId){
                 await db.insert(invoices).values({
                     id: invoice.id,
                     userId,
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
             const failedInvoice = event.data.object as Stripe.Invoice;
             // console.log({failedInvoice})
             const userId = failedInvoice?.subscription_details?.metadata?.clerkUserId || "" as string
-            if (failedInvoice){
+            if (failedInvoice && userId){
                 await db.insert(invoices).values({
                     id: failedInvoice.id,
                     userId,
