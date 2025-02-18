@@ -1,6 +1,6 @@
 import { invoices, users } from '@/drizzle/schema';
 import { db } from '@/lib/db';
-import { stripe } from '@/lib/stripe';
+import { getActiveSubscription, stripe } from '@/lib/stripe';
 import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import {  NextResponse } from 'next/server';
@@ -56,15 +56,13 @@ export async function POST(req: Request) {
                 console.log(`Customer checkout completed`)
                 const session = event.data.object as Stripe.Checkout.Session;
                 console.log(session)
-                const subscription = await stripe.subscriptions.retrieve(
-                    session.subscription as string
-                );
+               const subscription = await getActiveSubscription(session.customer as string);
 
                 // Cancel previous subscription
-                if (session?.metadata?.previous_subscription) {
+                if (subscription) {
                     console.log(`Cancel previous subscription`)
                     await stripe.subscriptions.update(
-                        session.metadata.previous_subscription,
+                        subscription.id,
                         { 
                             items: [{
                                 id: subscription?.items?.data[0].id as string,
