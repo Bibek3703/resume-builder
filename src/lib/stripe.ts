@@ -58,6 +58,11 @@ export async function createSubscriptionSession(
         mode: 'subscription',
         success_url: `${process.env.NEXT_PUBLIC_APP_URL}/dashboard?success=true`,
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
+        metadata: {
+            clerkUserId,
+            previous_subscription: currentSubscriptionId || '',
+            priceId,
+        },
         subscription_data: {
             metadata: {
                 clerkUserId,
