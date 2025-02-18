@@ -59,7 +59,8 @@ export async function createSubscriptionSession(
         cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/settings/billing`,
         subscription_data: {
             metadata: {
-                previous_subscription: currentSubscriptionId || ''
+                previous_subscription: currentSubscriptionId || '',
+                priceId,
             }
         }
     });

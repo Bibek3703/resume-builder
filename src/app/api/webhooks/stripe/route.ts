@@ -55,6 +55,7 @@ export async function POST(req: Request) {
         case 'checkout.session.completed':{
                 console.log(`Customer checkout completed`)
                 const session = event.data.object as Stripe.Checkout.Session;
+                console.log(session)
                 const subscription = await stripe.subscriptions.retrieve(
                     session.subscription as string
                 );
@@ -63,7 +64,13 @@ export async function POST(req: Request) {
                 if (session?.metadata?.previous_subscription) {
                     await stripe.subscriptions.update(
                         session.metadata.previous_subscription,
-                        { cancel_at_period_end: true }
+                        { 
+                            items: [{
+                                price: session?.metadata?.priceId,
+                            }],
+                            proration_behavior: 'create_prorations',
+                            cancel_at_period_end: true 
+                        }
                     );
                 }
 
@@ -81,7 +88,7 @@ export async function POST(req: Request) {
         case 'invoice.payment_succeeded':{
             const invoice = event.data.object as Stripe.Invoice;
             const userId = invoice?.subscription_details?.metadata?.clerkUserId || "" as string
-            // console.log({ userId })
+            console.log({ userId })
 
 
             if(invoice){
