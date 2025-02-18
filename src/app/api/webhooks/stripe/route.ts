@@ -80,9 +80,9 @@ export async function POST(req: Request) {
         
         case 'invoice.payment_succeeded':{
             const invoice = event.data.object as Stripe.Invoice;
-            console.log({ userId: event.data })
             const userId = invoice?.subscription_details?.metadata?.clerkUserId || "" as string
-            console.log({ userId })
+            // console.log({ userId })
+
 
             if(invoice){
                 await db.insert(invoices).values({
