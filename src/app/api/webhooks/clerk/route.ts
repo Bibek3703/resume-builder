@@ -108,15 +108,10 @@ export async function POST(req: NextRequest) {
         case "user.deleted": {
             if (id) {
                 // Delete user and related data in transaction
-                await db.transaction(async (tx) => {
-                    // First delete dependent records
-                    await tx.delete(invoices)
-                        .where(eq(invoices.userId, id));
-
-                    // Then delete the user
-                    await tx.delete(users)
-                        .where(eq(users.id, id));
-                });
+                await db.delete(invoices)
+                    .where(eq(invoices.userId, id));
+                await db.delete(users)
+                        .where(eq(users.id, id)); 
                 break;
             }
         }
