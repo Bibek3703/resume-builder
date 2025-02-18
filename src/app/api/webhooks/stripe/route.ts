@@ -1,6 +1,6 @@
 import { invoices, users } from '@/drizzle/schema';
 import { db } from '@/lib/db';
-import { getActiveSubscription, stripe } from '@/lib/stripe';
+import { stripe } from '@/lib/stripe';
 import { eq } from 'drizzle-orm';
 import { headers } from 'next/headers';
 import {  NextResponse } from 'next/server';
@@ -55,23 +55,29 @@ export async function POST(req: Request) {
         case 'checkout.session.completed':{
                 console.log(`Customer checkout completed`)
                 const session = event.data.object as Stripe.Checkout.Session;
-                console.log(session)
-               const subscription = await getActiveSubscription(session.customer as string);
-
+                console.log({ session: session?.metadata})
+                const subscription = await stripe.subscriptions.retrieve(
+                    session.subscription as string
+                );
                 // Cancel previous subscription
-                if (subscription) {
-                    console.log(`Cancel previous subscription`)
-                    await stripe.subscriptions.update(
-                        subscription.id,
-                        { 
-                            items: [{
-                                id: subscription?.items?.data[0].id as string,
-                                price: subscription.items.data[0].price.id,
-                            }],
-                            proration_behavior: 'create_prorations',
-                            cancel_at_period_end: true 
-                        }
+                if (session?.metadata?.previous_subscription) {
+                    const prevSubscription = await stripe.subscriptions.retrieve(
+                        session?.metadata?.previous_subscription as string
                     );
+                    if(prevSubscription){
+                        console.log(`Cancel previous subscription`)
+                        await stripe.subscriptions.update(
+                            prevSubscription.id,
+                            { 
+                                items: [{
+                                    id: prevSubscription?.items?.data[0].id as string,
+                                    price: prevSubscription.items.data[0].price.id,
+                                }],
+                                proration_behavior: 'create_prorations',
+                                cancel_at_period_end: true 
+                            }
+                        );
+                    }
                 }
 
                 // Update database
