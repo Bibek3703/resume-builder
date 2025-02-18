@@ -20,6 +20,7 @@ export async function POST(req: Request) {
             process.env.STRIPE_WEBHOOK_SECRET!
         );
     } catch (error) {
+        console.log(`Customer subscription created ${error}`)
         return new NextResponse('Webhook Error: '+error, { status: 500 });
     }
 
