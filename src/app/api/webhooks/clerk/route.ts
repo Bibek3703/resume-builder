@@ -3,7 +3,7 @@ import { headers } from 'next/headers'
 import { WebhookEvent } from '@clerk/nextjs/server'
 import { NextRequest, NextResponse } from 'next/server'
 import { db } from '@/lib/db'
-import { users } from '@/drizzle/schema'
+import { invoices, users } from '@/drizzle/schema'
 import { eq } from 'drizzle-orm'
 import { stripe } from '@/lib/stripe'
 
@@ -107,16 +107,16 @@ export async function POST(req: NextRequest) {
         }
         case "user.deleted": {
             if (id) {
+                // Delete user and related data in transaction
+                await db.transaction(async (tx) => {
+                    // First delete dependent records
+                    await tx.delete(invoices)
+                        .where(eq(invoices.userId, id));
 
-                const user = await db
-                    .select()
-                    .from(users)
-                    .where(eq(users.id, id))
-                    .then(rows => rows[0]);
-                if (user && evt?.data) {
-                    console.log(`Delete user's profile of user with ID ${id}`)
-                    await db.delete(users).where(eq(users.id, id))
-                }
+                    // Then delete the user
+                    await tx.delete(users)
+                        .where(eq(users.id, id));
+                });
                 break;
             }
         }

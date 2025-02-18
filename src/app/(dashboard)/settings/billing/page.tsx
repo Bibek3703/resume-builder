@@ -3,8 +3,8 @@
 import { format } from "date-fns";
 import { Skeleton } from "@/components/ui/skeleton";
 import PricingList from "../_components/PricingList";
-import SubscriptionStatus from "../_components/SubscriptionStatus";
 import { useBilling } from "@/contexts/billing-context";
+import SubscriptionStatus from "../_components/SubscriptionStatus";
 
 export default function BillingPage() {
     const { data, loading } = useBilling();

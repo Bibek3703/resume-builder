@@ -13,7 +13,9 @@ export const users = pgTable('users', {
 
 export const resumes = pgTable('resumes', {
     id: uuid('id').defaultRandom(),
-    userId: text('user_id').references(() => users.id),
+    userId: text('user_id').references(() => users.id, {
+        onDelete: 'cascade' // Add cascade deletion
+    }),
     content: json('content'),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
@@ -21,7 +23,9 @@ export const resumes = pgTable('resumes', {
 
 export const invoices = pgTable('invoices', {
     id: text('id').primaryKey(),
-    userId: text('user_id').references(() => users.id),
+    userId: text('user_id').references(() => users.id, {
+        onDelete: 'cascade' // Add cascade deletion
+    }),
     amount: integer('amount').notNull(),
     currency: text('currency').notNull(),
     status: text('status').notNull(),

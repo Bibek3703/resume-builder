@@ -58,8 +58,6 @@ export async function POST(req: Request) {
                     session.subscription as string
                 );
 
-                console.log({session})
-
                 // Cancel previous subscription
                 if (session?.metadata?.previous_subscription) {
                     await stripe.subscriptions.update(
@@ -78,15 +76,18 @@ export async function POST(req: Request) {
                     .where(eq(users.stripeCustomerId, session.customer as string));
             }
             break;
+        
         case 'invoice.payment_succeeded':{
             const invoice = event.data.object as Stripe.Invoice;
-            // console.log({invoice})
+            console.log({ userId: invoice?.subscription_details?.metadata })
             const userId = invoice?.subscription_details?.metadata?.clerkUserId || "" as string
+            console.log({ userId })
+
             if(invoice){
                 await db.insert(invoices).values({
                     id: invoice.id,
                     userId,
-                    amount: invoice.amount_paid,
+                    amount: invoice.total,
                     currency: invoice.currency,
                     status: 'paid',
                     pdfUrl: invoice.invoice_pdf,
