@@ -67,7 +67,7 @@ export async function POST(req: Request) {
                         { 
                             items: [{
                                 id: subscription?.items?.data[0].id as string,
-                                price: session?.metadata?.priceId,
+                                price: subscription.items.data[0].price.id,
                             }],
                             proration_behavior: 'create_prorations',
                             cancel_at_period_end: true 
