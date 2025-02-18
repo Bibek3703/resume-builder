@@ -62,6 +62,7 @@ export async function POST(req: Request) {
 
                 // Cancel previous subscription
                 if (session?.metadata?.previous_subscription) {
+                    console.log(`Cancel previous subscription`)
                     await stripe.subscriptions.update(
                         session.metadata.previous_subscription,
                         { 
