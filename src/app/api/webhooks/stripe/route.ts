@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         
         case 'invoice.payment_succeeded':{
             const invoice = event.data.object as Stripe.Invoice;
-            console.log({ userId: invoice?.subscription_details?.metadata })
+            console.log({ userId: event.data })
             const userId = invoice?.subscription_details?.metadata?.clerkUserId || "" as string
             console.log({ userId })
 

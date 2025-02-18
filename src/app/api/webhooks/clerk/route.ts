@@ -76,7 +76,8 @@ export async function POST(req: NextRequest) {
                     payment_behavior: 'default_incomplete',
                     expand: ['latest_invoice.payment_intent'],
                     metadata: {
-                        clerkUserId: clerkUser.id
+                        clerkUserId: clerkUser.id,
+                        mode: 'subscription',
                     }
                 });
 
