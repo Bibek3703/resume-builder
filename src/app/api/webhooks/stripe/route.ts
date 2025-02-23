@@ -55,7 +55,6 @@ export async function POST(req: Request) {
         case 'checkout.session.completed':{
                 console.log(`Customer checkout completed`)
                 const session = event.data.object as Stripe.Checkout.Session;
-            console.log({ session: session?.metadata })
                 const subscription = await stripe.subscriptions.retrieve(
                     session.subscription as string
                 );
@@ -94,8 +93,6 @@ export async function POST(req: Request) {
         case 'invoice.payment_succeeded':{
             const invoice = event.data.object as Stripe.Invoice;
             const userId = invoice?.subscription_details?.metadata?.clerkUserId || "" as string
-            console.log({ userId })
-
 
             if(invoice && userId){
                 await db.insert(invoices).values({

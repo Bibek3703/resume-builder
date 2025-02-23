@@ -10,7 +10,10 @@ import { useState } from "react";
 function PricingList() {
     const [value, setValue] = useState("month");
     return (
-        <div className="flex flex-col border border-black/[0.2] group/canvas-card items-center dark:border-white/[0.2] w-full max-w-4xl mx-auto py-4 relative">
+        <div
+            id="pricing-list"
+            className="flex flex-col border border-black/[0.2] group/canvas-card items-center dark:border-white/[0.2] w-full max-w-4xl mx-auto py-4 relative"
+        >
             <Icon className="absolute h-6 w-6 -top-3 -left-3 dark:text-white text-black" />
             <Icon className="absolute h-6 w-6 -bottom-3 -left-3 dark:text-white text-black" />
             <Icon className="absolute h-6 w-6 -top-3 -right-3 dark:text-white text-black" />
@@ -18,11 +21,11 @@ function PricingList() {
 
             <Header value={value} onValueChange={setValue} />
             <SubscriptionCards frequency={value} />
-            <div className="relative mt-28 mb-12 flex flex-col md:flex-row items-center w-full bg-gray-50">
-                <div className="absolute top-0 md:-left-7 w-full md:w-[106.5%] border-t border-dashed border-black/20" />
-                <div className="absolute top-0 md:-top-5 md:left-5 h-full md:h-[118%] md:border-l border-dashed border-black/20" />
-                <div className="absolute bottom-0 md:-left-7 w-full md:w-[106.5%] border-t border-dashed border-black/20" />
-                <div className="absolute top-0 md:-top-5 md:right-5 h-full md:h-[118%] md:border-l border-dashed border-black/20" />
+            <div className="relative mt-28 mb-12 flex flex-col md:flex-row items-center w-full">
+                <div className="absolute top-0 md:-left-7 w-full md:w-[106.5%] border-t border-dashed border-black/20 dark:border-gray-600" />
+                <div className="absolute top-0 md:-top-5 md:left-5 h-full md:h-[118%] md:border-l border-dashed border-black/20 dark:border-gray-600" />
+                <div className="absolute bottom-0 md:-left-7 w-full md:w-[106.5%] border-t border-dashed border-black/20 dark:border-gray-600" />
+                <div className="absolute top-0 md:-top-5 md:right-5 h-full md:h-[118%] md:border-l border-dashed border-black/20 dark:border-gray-600" />
 
                 <div className="p-10 md:pl-20 w-full md:max-w-lg flex flex-col gap-6 items-start">
                     <h1>
@@ -36,7 +39,7 @@ function PricingList() {
                         </Button>
                     </div>
                 </div>
-                <div className="flex-1 p-10 w-auto border-none md:border-l md:border-dashed md:border-black/20 flex flex-col justify-center">
+                <div className="flex-1 p-10 w-auto border-none md:border-l md:border-dashed md:border-black/20 md:dark:border-gray-600 flex flex-col justify-center">
                     <p>
                         &ldquo;This is the best product ever when it comes to
                         shipping. Ten on ten recommended. I just can&apos;t wait

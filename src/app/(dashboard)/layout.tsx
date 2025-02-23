@@ -15,13 +15,13 @@ export default async function DashboardLayout({
 }) {
     const userData = await getNavbarUserData();
     return (
-        <BillingProvider>
-            <div className="min-h-screen bg-background">
+        <div className="min-h-screen">
+            <BillingProvider>
                 <ProgressBar />
                 {/* <ErrorToast /> */}
                 <DashboardNavbar userData={userData} />
                 <main className="p-4 md:p-8">{children}</main>
-            </div>
-        </BillingProvider>
+            </BillingProvider>
+        </div>
     );
 }

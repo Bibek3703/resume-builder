@@ -1,3 +1,4 @@
+import { ResumeContent } from '@/types/content';
 import { integer, json, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core';
 
 export const users = pgTable('users', {
@@ -16,10 +17,12 @@ export const resumes = pgTable('resumes', {
     userId: text('user_id').references(() => users.id, {
         onDelete: 'cascade' // Add cascade deletion
     }),
-    content: json('content'),
+    title: text('title').notNull(),
+    content: json('content').$type<ResumeContent>().notNull(),
     createdAt: timestamp('created_at').defaultNow(),
     updatedAt: timestamp('updated_at').defaultNow(),
 });
+
 
 export const invoices = pgTable('invoices', {
     id: text('id').primaryKey(),

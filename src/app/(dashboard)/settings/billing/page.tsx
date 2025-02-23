@@ -14,12 +14,10 @@ export default function BillingPage() {
     return (
         <div className="max-w-4xl mx-auto py-8 space-y-8">
             {/* Current Subscription Section */}
-            <section className="bg-white p-6 rounded-lg shadow">
-                <SubscriptionStatus />
-            </section>
+            <SubscriptionStatus />
 
             {/* Billing History Section */}
-            <section className="bg-white p-6 rounded-lg shadow">
+            <section className="bg-gradient-to-br from-gray-900 to-gray-800 border border-gray-600 p-6 rounded-lg shadow">
                 <h2 className="text-2xl font-bold mb-6">Billing History</h2>
                 <div className="overflow-x-auto">
                     <table className="w-full">
@@ -53,8 +51,8 @@ export default function BillingPage() {
                                         <span
                                             className={`px-2 py-1 rounded text-sm ${
                                                 invoice.status === "paid"
-                                                    ? "bg-green-100 text-green-800"
-                                                    : "bg-red-100 text-red-800"
+                                                    ? "bg-green-300 text-green-800"
+                                                    : "bg-red-300 text-red-800"
                                             }`}
                                         >
                                             {invoice.status}

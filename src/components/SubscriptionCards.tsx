@@ -6,6 +6,7 @@ import { CardSpotlight } from "./ui/card-spotlight";
 import { CheckIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useBilling } from "@/contexts/billing-context";
+import { useTheme } from "next-themes";
 
 const PLANS = [
     {
@@ -123,6 +124,7 @@ export function SubscriptionCards(
 ) {
     const [loading, setLoading] = useState<string | null>(null);
     const { data } = useBilling();
+    const { theme } = useTheme();
 
     const handleSubscribe = async (priceId: string) => {
         setLoading(priceId);
@@ -143,12 +145,12 @@ export function SubscriptionCards(
             {PLANS.map((plan, idx) => (
                 <CardSpotlight
                     key={plan.prices[frequency].priceId}
-                    color={"#fff"}
+                    color={theme !== "dark" || idx !== 1 ? "#374151" : "#000"}
                     className={cn(
                         "flex flex-col col-span-1 p-6 rounded-none border-none",
                         idx === 1
-                            ? "bg-white text-black shadow-2xl shadow-gray-500 drop-shadow-xl"
-                            : "bg-gray-200 text-gray-700",
+                            ? "bg-background text-foreground dark: shadow-2xl shadow-blue-500/30 drop-shadow-xl"
+                            : "bg-gray-200 dark:bg-muted text-gray-700 dark:text-muted-foreground",
                     )}
                 >
                     <h3 className="text-xl font-bold mb-4 z-20">
