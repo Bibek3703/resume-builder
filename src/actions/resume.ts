@@ -2,12 +2,11 @@
 
 import { resumes } from '@/drizzle/schema';
 import { db } from '@/lib/db';
-import { geminiResumeReader, generationConfig } from '@/lib/gemini';
+import { Resume } from '@/types/content';
 import { auth } from '@clerk/nextjs/server';
 import { and, eq } from 'drizzle-orm';
-import {promises as fs} from 'fs'
 
-export async function saveResume(id: string, data: any) {
+export async function saveResume(id: string, data: Resume) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthorized");
 

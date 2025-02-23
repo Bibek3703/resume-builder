@@ -9,7 +9,6 @@ import {
 } from "../ui/animated-modal";
 import { MessageSquareMore } from "lucide-react";
 import { HoverEffect } from "../ui/card-hover-effect";
-import { ScrollArea } from "../ui/scroll-area";
 
 export type AISuggestion = {
     title: string;

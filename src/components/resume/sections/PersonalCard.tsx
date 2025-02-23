@@ -12,7 +12,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ResumeFormData } from "@/types/content";
 import Image from "next/image";
 import React from "react";
-import { Control, UseFormReturn } from "react-hook-form";
+import { UseFormReturn } from "react-hook-form";
 
 function PersonalCard({
     form,

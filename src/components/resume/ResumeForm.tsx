@@ -28,10 +28,6 @@ import {
 } from "../ui/form";
 import { resumeDefaultValues } from "@/app/data/values";
 import { GeneratedType, useAIGenerative } from "@/hooks/use-aiGenerative";
-import { AISuggestion } from "./ResumeAISuggestion";
-import { useState } from "react";
-import { testContent } from "@/app/data/test";
-import { FileUpload } from "../ui/file-upload";
 
 export default function ResumeForm() {
     const router = useRouter();
@@ -41,16 +37,6 @@ export default function ResumeForm() {
         mode: "onChange",
     });
     const { generateSection, isLoading } = useAIGenerative();
-    const [generatedContent, setGeneratedContent] = useState<
-        AISuggestion[] | null
-    >(
-        testContent.map((
-            content: { section_title: string; description: string },
-        ) => ({
-            title: content.section_title,
-            description: content.description,
-        } as AISuggestion)),
-    );
 
     const {
         fields: experienceFields,

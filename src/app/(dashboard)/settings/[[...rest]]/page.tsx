@@ -1,4 +1,3 @@
-import { UserProfile } from "@clerk/nextjs";
 import { Metadata } from "next";
 import SubscriptionBilling from "../_components/SubscriptionBilling";
 import Profile from "../_components/Profile";
