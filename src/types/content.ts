@@ -20,9 +20,9 @@ export type PersonalInfo = {
     summary: string;
     website?: string; // Optional personal website
     socialLinks?: {
-        linkedin: SocialLink;
+        linkedin?: SocialLink;
         github?: SocialLink;
-        twitter: SocialLink;
+        twitter?: SocialLink;
         portfolio?: SocialLink;
         other?: SocialLink;
     };
@@ -37,9 +37,9 @@ export const socialLinkSchema = z.object({
 
 // Define social links schema
 const socialLinksSchema = z.object({
-    linkedin: socialLinkSchema,
+    linkedin: socialLinkSchema.optional(),
     github: socialLinkSchema.optional(),
-    twitter: socialLinkSchema,
+    twitter: socialLinkSchema.optional(),
     portfolio: socialLinkSchema.optional(),
     other: socialLinkSchema.optional(),
 });

@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 
 type Tab = {
   title: string;
   value: string;
-  content?: string | React.ReactNode | any;
+  content?: string | React.ReactNode;
 };
 
 export const Tabs = ({
@@ -30,19 +30,19 @@ export const Tabs = ({
   const [active, setActive] = useState<Tab>(propTabs[activeIndex]);
   const [tabs, setTabs] = useState<Tab[]>(propTabs);
 
-  const moveSelectedTabToTop = (idx: number) => {
+  const moveSelectedTabToTop = useCallback((idx: number) => {
     const newTabs = [...propTabs];
     const selectedTab = newTabs.splice(idx, 1);
     newTabs.unshift(selectedTab[0]);
     setTabs(newTabs);
     setActive(newTabs[0]);
-  };
+  }, [propTabs]);
 
   const [hovering, setHovering] = useState(true);
 
   useEffect(() => {
     moveSelectedTabToTop(activeIndex);
-  }, [activeIndex]);
+  }, [activeIndex, moveSelectedTabToTop]);
 
   return (
     <>

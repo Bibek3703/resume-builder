@@ -1,7 +1,6 @@
 "use client";
 
 import { useResume } from "@/contexts/resume-context";
-import { Resume } from "@/types/content";
 import {
     Document,
     Link,
@@ -58,11 +57,7 @@ const styles = StyleSheet.create({
     },
 });
 
-export default function ResumePDF({
-    data,
-}: {
-    data: Resume;
-}) {
+export default function ResumePDF() {
     const { form } = useResume();
     const {
         content: {
@@ -91,16 +86,18 @@ export default function ResumePDF({
                                 </Text>
                             </View>
                             <View>
-                                {personalInfo?.socialLinks?.map((
-                                    link,
-                                    index,
-                                ) => (
-                                    <Link key={index} src={link.url}>
-                                        {link.platform === "Other"
-                                            ? link.label
-                                            : link.platform}
-                                    </Link>
-                                ))}
+                                {personalInfo?.socialLinks &&
+                                    Object.values(personalInfo?.socialLinks)
+                                        .map((
+                                            link,
+                                            index,
+                                        ) => (
+                                            <Link key={index} src={link.url}>
+                                                {link.platform === "Other"
+                                                    ? link.label
+                                                    : link.platform}
+                                            </Link>
+                                        ))}
                             </View>
                         </View>
                         <Text style={styles.subtitle}>

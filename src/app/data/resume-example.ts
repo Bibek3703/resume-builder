@@ -15,21 +15,21 @@ export const exampleResumeData: ResumeFormData = {
             },
             summary: "Experienced software developer with over 8 years of expertise in full-stack development, specializing in React, Node.js, and cloud technologies. Proven track record of delivering scalable solutions and leading development teams.",
             website: "https://johnsmith.dev",
-            socialLinks: [
-                {
+            socialLinks: {
+                linkedin:{
                     platform: "LinkedIn",
                     url: "https://linkedin.com/in/johnsmith"
                 },
-                {
+                github:{
                     platform: "GitHub",
                     url: "https://github.com/johnsmith"
                 },
-                {
+                other:{
                     platform: "Other",
                     url: "https://medium.com/@johnsmith",
                     label: "Medium Blog"
                 }
-            ]
+            }
         },
         experience: [
             {

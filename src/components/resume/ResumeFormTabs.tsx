@@ -112,38 +112,33 @@ export default function ResumeFormTabs() {
 
     return (
         <div className="h-[100vh] md:h-[85vh] [perspective:1000px] relative b flex flex-col max-w-5xl mx-auto w-full  items-start justify-start">
-            <div className="flex items-center justify-between w-full py-1">
-                <h1 className="text-xl md:text-2xl font-semibold text-blue-500">
-                    {tabs[activeIndex].title}
-                </h1>
-                <div className="flex items-center gap-3">
-                    <Button
-                        size="icon"
-                        className="rounded-full w-8 h-8 p-0"
-                        disabled={activeIndex === 0}
-                        onClick={() => {
-                            setActiveIndex((prevIndex) =>
-                                prevIndex > 0 ? prevIndex - 1 : prevIndex
-                            );
-                        }}
-                    >
-                        <ArrowLeft />
-                    </Button>
-                    <Button
-                        size="icon"
-                        className="rounded-full w-8 h-8 p-0"
-                        disabled={activeIndex === tabs.length - 1}
-                        onClick={() => {
-                            setActiveIndex((prevIndex) =>
-                                prevIndex < tabs.length - 1
-                                    ? prevIndex + 1
-                                    : prevIndex
-                            );
-                        }}
-                    >
-                        <ArrowRight className="w-6 h-6" />
-                    </Button>
-                </div>
+            <div className="flex items-center justify-center gap-6 w-full py-1">
+                <Button
+                    size="icon"
+                    className="rounded-full w-8 h-8 p-0"
+                    disabled={activeIndex === 0}
+                    onClick={() => {
+                        setActiveIndex((prevIndex) =>
+                            prevIndex > 0 ? prevIndex - 1 : prevIndex
+                        );
+                    }}
+                >
+                    <ArrowLeft />
+                </Button>
+                <Button
+                    size="icon"
+                    className="rounded-full w-8 h-8 p-0"
+                    disabled={activeIndex === tabs.length - 1}
+                    onClick={() => {
+                        setActiveIndex((prevIndex) =>
+                            prevIndex < tabs.length - 1
+                                ? prevIndex + 1
+                                : prevIndex
+                        );
+                    }}
+                >
+                    <ArrowRight className="w-6 h-6" />
+                </Button>
             </div>
             <Form {...form}>
                 <Tabs
