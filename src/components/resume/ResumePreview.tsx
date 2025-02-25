@@ -1,19 +1,15 @@
 "use client";
 
 import React from "react";
-import { Resume } from "@/types/content";
-import ResumePDF from "./ResumePDF";
+import { useResume } from "@/contexts/resume-context";
 
-function ResumePreview({
-    data,
-}: {
-    data: Resume;
-}) {
-    if (!data) return null;
+function ResumePreview() {
+    const { form } = useResume();
+
+    const formValues = form.watch();
 
     return (
-        <div className="w-full h-full max-h-full bg-secondary rounded-xl overflow-hidden">
-            <ResumePDF data={data} />
+        <div className="w-full h-full min-h-max bg-secondary rounded-xl overflow-hidden">
         </div>
     );
 }

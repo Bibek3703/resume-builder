@@ -1,5 +1,6 @@
 "use client";
 
+import { useResume } from "@/contexts/resume-context";
 import { Resume } from "@/types/content";
 import {
     Document,
@@ -62,14 +63,17 @@ export default function ResumePDF({
 }: {
     data: Resume;
 }) {
+    const { form } = useResume();
     const {
-        personalInfo,
-        experience,
-        education,
-        skills,
-        awards,
-        projects,
-    } = data.content;
+        content: {
+            personalInfo,
+            experience,
+            education,
+            skills,
+            awards,
+            projects,
+        },
+    } = form.watch();
     return (
         <PDFViewer className="w-full h-full">
             <Document>

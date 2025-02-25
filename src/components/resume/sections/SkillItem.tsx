@@ -1,19 +1,17 @@
 import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { ResumeFormData } from "@/types/content";
+import { useResume } from "@/contexts/resume-context";
 import { X } from "lucide-react";
 import React from "react";
-import { Control } from "react-hook-form";
 
-function SkillItem({ index, control, onRemoveSkill = () => {} }: {
+function SkillItem({ index }: {
     index: number;
-    control: Control<ResumeFormData>;
-    onRemoveSkill?: () => void;
 }) {
+    const { form, removeSkill } = useResume();
     return (
         <FormField
-            control={control}
+            control={form.control}
             name={`content.skills.${index}.name`}
             render={({ field }) => (
                 <div className="space-y-2">
@@ -30,7 +28,7 @@ function SkillItem({ index, control, onRemoveSkill = () => {} }: {
                             variant="destructive"
                             type="button"
                             size="icon"
-                            onClick={() => onRemoveSkill()}
+                            onClick={() => removeSkill(index)}
                             className="w-6 h-6"
                         >
                             <X className="h-4 w-4" />

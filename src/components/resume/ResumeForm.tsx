@@ -1,11 +1,8 @@
 "use client";
 
 import type React from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { ResumeFormData, resumeSchema } from "@/types/content";
 import ExperienceCard from "./sections/ExperienceCard";
 import Educationcard from "./sections/EducationCard";
 import PersonalCard from "./sections/PersonalCard";
@@ -17,7 +14,6 @@ import {
     PlusCircle,
 } from "lucide-react";
 import SkillItem from "./sections/SkillItem";
-import { useFieldArray, useForm } from "react-hook-form";
 import {
     Form,
     FormControl,
@@ -26,70 +22,22 @@ import {
     FormLabel,
     FormMessage,
 } from "../ui/form";
-import { resumeDefaultValues } from "@/app/data/values";
-import { GeneratedType, useAIGenerative } from "@/hooks/use-aiGenerative";
+import { useResume } from "@/contexts/resume-context";
 
 export default function ResumeForm() {
-    const router = useRouter();
-    const form = useForm<ResumeFormData>({
-        resolver: zodResolver(resumeSchema),
-        defaultValues: resumeDefaultValues,
-        mode: "onChange",
-    });
-    const { generateSection, isLoading } = useAIGenerative();
-
     const {
-        fields: experienceFields,
-        append: appendExperience,
-        remove: removeExperience,
-    } = useFieldArray({
-        control: form.control,
-        name: "content.experience",
-    });
+        form,
+        onSubmit,
+        experienceFields,
+        appendExperience,
+        educationFields,
+        appendEducation,
+        skillFields,
+        appendSkill,
+        isLoading,
+    } = useResume();
 
-    const {
-        fields: educationFields,
-        append: appendEducation,
-        remove: removeEducation,
-    } = useFieldArray({
-        control: form.control,
-        name: "content.education",
-    });
-
-    const { fields: skillFields, append: appendSkill, remove: removeSkill } =
-        useFieldArray({
-            control: form.control,
-            name: "content.skills",
-        });
-
-    const onSubmit = async (data: ResumeFormData) => {
-        try {
-            const response = await fetch("/api/resumes", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(data),
-            });
-
-            if (response.ok) {
-                router.push("/resumes"); // Redirect to resumes list page
-            } else {
-                console.error("Failed to create resume");
-            }
-        } catch (error) {
-            console.error("Error submitting form:", error);
-        }
-    };
-
-    const handleAIHelp = async (prompt: string) => {
-        const generated = await generateSection(prompt) as GeneratedType;
-        if (generated?.content) {
-            const contents = JSON.parse(generated.content);
-            console.log({ contents });
-            form.setValue("content.personalInfo.summary", contents.summary);
-        }
-    };
+    if (!form) return null;
 
     return (
         <div className="w-full">
@@ -147,10 +95,7 @@ export default function ResumeForm() {
                                 </span>
                                 Personal Information
                             </h3>
-                            <PersonalCard
-                                form={form}
-                                onAIHelp={handleAIHelp}
-                            />
+                            <PersonalCard />
                         </div>
 
                         <div className="space-y-6">
@@ -162,9 +107,6 @@ export default function ResumeForm() {
                                 <ExperienceCard
                                     key={index}
                                     index={index}
-                                    control={form.control}
-                                    onRemoveExperience={() =>
-                                        removeExperience(index)}
                                 />
                             ))}
                             <Button
@@ -195,9 +137,6 @@ export default function ResumeForm() {
                                 <Educationcard
                                     key={index}
                                     index={index}
-                                    control={form.control}
-                                    onRemoveEducation={() =>
-                                        removeEducation(index)}
                                 />
                             ))}
                             <Button
@@ -227,8 +166,6 @@ export default function ResumeForm() {
                                     <SkillItem
                                         key={index}
                                         index={index}
-                                        control={form.control}
-                                        onRemoveSkill={() => removeSkill(index)}
                                     />
                                 ))}
                             </div>

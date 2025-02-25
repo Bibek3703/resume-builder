@@ -1,6 +1,7 @@
 import { DashboardNavbar } from "@/components/DashboardNavbar";
 import { ProgressBar } from "@/components/ProgressBar";
 import BillingProvider from "@/contexts/billing-context";
+import ResumeProvider from "@/contexts/resume-context";
 import { getNavbarUserData } from "@/lib/user";
 
 export const metadata = {
@@ -17,10 +18,12 @@ export default async function DashboardLayout({
     return (
         <div className="min-h-screen">
             <BillingProvider>
-                <ProgressBar />
-                {/* <ErrorToast /> */}
-                <DashboardNavbar userData={userData} />
-                <main className="p-4 md:p-8">{children}</main>
+                <ResumeProvider>
+                    <ProgressBar />
+                    {/* <ErrorToast /> */}
+                    <DashboardNavbar userData={userData} />
+                    <main className="p-4 md:p-8">{children}</main>
+                </ResumeProvider>
             </BillingProvider>
         </div>
     );

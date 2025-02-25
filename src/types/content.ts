@@ -19,7 +19,13 @@ export type PersonalInfo = {
     };
     summary: string;
     website?: string; // Optional personal website
-    socialLinks?: SocialLink[];
+    socialLinks?: {
+        linkedin: SocialLink;
+        github?: SocialLink;
+        twitter: SocialLink;
+        portfolio?: SocialLink;
+        other?: SocialLink;
+    };
 };
 
 // Corresponding Zod schema for validation
@@ -27,6 +33,15 @@ export const socialLinkSchema = z.object({
     platform: z.enum(['LinkedIn', 'GitHub', 'Twitter', 'Portfolio', 'Other']),
     url: z.string().url('Please enter a valid URL'),
     label: z.string().optional(),
+});
+
+// Define social links schema
+const socialLinksSchema = z.object({
+    linkedin: socialLinkSchema,
+    github: socialLinkSchema.optional(),
+    twitter: socialLinkSchema,
+    portfolio: socialLinkSchema.optional(),
+    other: socialLinkSchema.optional(),
 });
 
 export const personalInfoSchema = z.object({
@@ -43,9 +58,7 @@ export const personalInfoSchema = z.object({
         .min(50, 'Summary should be at least 50 characters')
         .max(500, 'Summary should not exceed 500 characters'),
     website: z.string().url('Please enter a valid URL').optional(),
-    socialLinks: z.array(socialLinkSchema)
-        .min(1, 'At least one social link is required')
-        .max(5, 'Maximum 5 social links allowed'),
+    socialLinks: socialLinksSchema.optional(),
 
 });
 

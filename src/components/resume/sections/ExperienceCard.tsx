@@ -10,37 +10,31 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { ResumeFormData } from "@/types/content";
+import { useResume } from "@/contexts/resume-context";
 import { X } from "lucide-react";
 import React from "react";
-import { Control } from "react-hook-form";
 
 function ExperienceCard({
     index = 0,
-    onRemoveExperience = () => {},
-    control,
 }: {
     index: number;
-    control: Control<ResumeFormData>;
-    onRemoveExperience?: () => void;
 }) {
+    const { form, removeExperience } = useResume();
     return (
-        <Card className="bg-secondary border-gray-600">
-            <CardHeader className="relative pb-0">
-                <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    onClick={() => onRemoveExperience()}
-                    className="absolute top-2 right-2 z-10 rounded-full"
-                >
-                    <X />
-                </Button>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+        <div className="relative w-full p-4 bg-secondary rounded-md">
+            <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                onClick={() => removeExperience(index)}
+                className="absolute top-2 right-2 z-10 rounded-full"
+            >
+                <X />
+            </Button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
                 <div className="space-y-2">
                     <FormField
-                        control={control}
+                        control={form.control}
                         name={`content.experience.${index}.company`}
                         render={({ field }) => (
                             <FormItem className="w-full gap-2">
@@ -66,7 +60,7 @@ function ExperienceCard({
                 </div>
                 <div className="space-y-2">
                     <FormField
-                        control={control}
+                        control={form.control}
                         name={`content.experience.${index}.position`}
                         render={({ field }) => (
                             <FormItem className="w-full gap-2">
@@ -92,7 +86,7 @@ function ExperienceCard({
                 </div>
                 <div className="space-y-2">
                     <FormField
-                        control={control}
+                        control={form.control}
                         name={`content.experience.${index}.location`}
                         render={({ field }) => (
                             <FormItem className="w-full gap-2">
@@ -118,7 +112,7 @@ function ExperienceCard({
                 </div>
                 <div className="space-y-2">
                     <FormField
-                        control={control}
+                        control={form.control}
                         name={`content.experience.${index}.startDate`}
                         render={({ field }) => (
                             <FormItem className="w-full gap-2">
@@ -145,7 +139,7 @@ function ExperienceCard({
                 </div>
                 <div className="space-y-2">
                     <FormField
-                        control={control}
+                        control={form.control}
                         name={`content.experience.${index}.endDate`}
                         render={({ field }) => (
                             <FormItem className="w-full gap-2">
@@ -172,7 +166,7 @@ function ExperienceCard({
                 </div>
                 <div className="flex items-center space-x-2">
                     <FormField
-                        control={control}
+                        control={form.control}
                         name={`content.experience.${index}.current`}
                         render={({ field }) => (
                             <FormItem className="w-full flex items-center gap-2">
@@ -197,7 +191,7 @@ function ExperienceCard({
                 </div>
                 <div className="space-y-2 md:col-span-2">
                     <FormField
-                        control={control}
+                        control={form.control}
                         name={`content.experience.${index}.description`}
                         render={({ field }) => (
                             <FormItem className="w-full gap-2">
@@ -221,8 +215,8 @@ function ExperienceCard({
                         )}
                     />
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }
 
